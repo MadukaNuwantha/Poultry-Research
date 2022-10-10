@@ -10,14 +10,33 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  double t = 10;
-  double h = 10;
-  late DatabaseReference databaseReference;
+  double temperature = 0;
+  double humidity = 0;
+  late DatabaseReference databaseReferenceTemperature;
+  late DatabaseReference databaseReferenceHumidity;
 
   @override
   void initState() {
     super.initState();
-    databaseReference = FirebaseDatabase.instance.ref().child('');
+    databaseReferenceTemperature = FirebaseDatabase.instance.ref().child('DHT11/Temperature');
+    databaseReferenceHumidity = FirebaseDatabase.instance.ref().child('DHT11/Humidity');
+    getDatabaseData();
+  }
+
+  getDatabaseData() {
+    print('Get data method called!');
+    databaseReferenceTemperature.onValue.listen((event) {
+      print('Temperature method called!');
+      setState(() {
+        humidity = double.parse(event.snapshot.value.toString());
+      });
+    });
+    databaseReferenceHumidity.onValue.listen((event) {
+      print('Humidity method called!');
+      setState(() {
+        temperature = double.parse(event.snapshot.value.toString());
+      });
+    });
   }
 
   @override
@@ -44,6 +63,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
           children: [
             Column(
               children: [
+                ElevatedButton(
+                  onPressed: () {
+                    getDatabaseData();
+                  },
+                  child: const Text('Refresh'),
+                ),
                 Container(
                   decoration: BoxDecoration(
                     border: Border.all(
@@ -62,11 +87,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                // Image.asset(
-                                //   'assets/images/humidity.png',
-                                //   color: Colors.white,
-                                //   scale: 5,
-                                // ),
+                                Image.asset(
+                                  'assets/images/humidity.png',
+                                  color: Colors.white,
+                                  scale: 5,
+                                ),
                                 const SizedBox(
                                   width: 5,
                                 ),
@@ -83,7 +108,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  h.toString(),
+                                  humidity.toString(),
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 30,
@@ -104,9 +129,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           height: 150,
                           width: 60,
                           child: LiquidLinearProgressIndicator(
-                            value: h / 100,
+                            value: humidity / 100,
                             valueColor: AlwaysStoppedAnimation(
-                              h >= 75.0 && h <= 90.0 ? Colors.green : Colors.red,
+                              humidity >= 75.0 && humidity <= 90.0 ? Colors.green : Colors.red,
                             ),
                             backgroundColor: Colors.white,
                             borderWidth: 3.8,
@@ -117,7 +142,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  h.toString(),
+                                  humidity.toString(),
                                   style: const TextStyle(
                                     fontSize: 20,
                                     color: Color.fromARGB(255, 0, 0, 0),
@@ -162,11 +187,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  // Image.asset(
-                                  //   'assets/images/temp.png',
-                                  //   color: Colors.white,
-                                  //   scale: 20,
-                                  // ),
+                                  Image.asset(
+                                    'assets/images/temp.png',
+                                    color: Colors.white,
+                                    scale: 20,
+                                  ),
                                   const SizedBox(width: 5),
                                   const Text(
                                     'Temperature',
@@ -182,7 +207,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
-                                    t.toString(),
+                                    temperature.toString(),
                                     style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 30,
@@ -203,9 +228,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             height: 150,
                             width: 60,
                             child: LiquidLinearProgressIndicator(
-                              value: t / 100,
+                              value: temperature / 100,
                               valueColor: AlwaysStoppedAnimation(
-                                t >= 25.0 && t <= 35.0 ? Colors.green : Colors.red,
+                                temperature >= 25.0 && temperature <= 35.0 ? Colors.green : Colors.red,
                               ),
                               backgroundColor: Colors.white,
                               borderWidth: 3.8,
@@ -216,7 +241,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
-                                    t.toString(),
+                                    temperature.toString(),
                                     style: const TextStyle(
                                       fontSize: 20,
                                       color: Color.fromARGB(255, 0, 0, 0),
